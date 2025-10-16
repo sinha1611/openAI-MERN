@@ -1,6 +1,7 @@
 # OpenAI-MERN
 # Prompt Manager — Architecture, Design, Setup & Usage
 
+
 ## Project Summary
 
 A responsive full‑stack web app that lets authenticated users create, save, version, tag, preview, search, filter, export, and import AI prompts/snippets. Built with **React.js** (frontend), **Express.js** (API backend), **Node.js**, and **MongoDB**.
@@ -197,15 +198,29 @@ npm run dev
 2. Start backend `npm run dev` (port 4002).
 3. Start frontend `npm run dev` (port 5173).
 4. Open `http://localhost:5173` and sign up.
+<img width="282" height="600" alt="image" src="https://github.com/user-attachments/assets/020b324e-d4b6-4a28-959c-a63ef7741355" />
+<img width="440" height="333" alt="Screenshot 2025-10-16 084202" src="https://github.com/user-attachments/assets/6f98e3af-4c46-4dbb-8d51-0c3d4bdf788c" />
+
 
 ---
 
 ## Usage Guide (short)
 
 * Sign up / log in.
+* <img width="282" height="600" alt="image" src="https://github.com/user-attachments/assets/8d83c27e-a9fa-4fad-ac40-acd7892dd2fb" />
+  <img width="440" height="333" alt="image" src="https://github.com/user-attachments/assets/71762365-1194-4cf9-9653-e791d971dfdd" />
 * Create a new prompt: give it a title, tags, and content.
-* Click **Preview** to run the prompt against Gemini (server will forward to Gemini API).
+* <img width="282" height="600" alt="image" src="https://github.com/user-attachments/assets/b9aab016-38d7-4393-a8b6-6975417ebb7d" />
+  <img width="440" height="333" alt="image" src="https://github.com/user-attachments/assets/7c21e543-cecf-47da-9e53-0c7865eb114f" />
+
+* Click **Preview** or presss **Enter Key** to run the prompt against Gemini (server will forward to Gemini API).
+* <img width="282" height="600" alt="image" src="https://github.com/user-attachments/assets/475e3b5c-a839-4d8c-8f38-17c9faba88ff" />
+  <img width="440" height="333" alt="image" src="https://github.com/user-attachments/assets/fee5af00-4c69-43c4-88d0-ec903813fbc8" />
+
 * Check the previous prompts and its response.
+* <img width="282" height="600" alt="image" src="https://github.com/user-attachments/assets/3dbe1517-e0bc-41f0-a78b-d9ae653e86d1" />
+  <img width="440" height="333" alt="image" src="https://github.com/user-attachments/assets/fee5af00-4c69-43c4-88d0-ec903813fbc8" />
+
 
 ---
 
