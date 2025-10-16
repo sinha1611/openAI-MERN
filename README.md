@@ -75,9 +75,9 @@ A responsive full‑stack web app that lets authenticated users create, save, ve
   "createdAt": "Date",
   "__v": "string"
 }
-
+```
 ---
-
+```
 ## Key Flows & Design Decisions
 
 ### Authentication
