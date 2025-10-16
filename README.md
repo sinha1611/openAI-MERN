@@ -23,6 +23,10 @@ A responsive full‑stack web app that lets authenticated users create, save, ve
                                 [Gemini API] (external)
 
 
+<img width="282" height="600" alt="ChatGPT Image Oct 16, 2025, 11_49_23 AM" src="https://github.com/user-attachments/assets/100f5355-1a3e-4ff8-9666-d3b18c6e97bc" />
+
+
+
 **Components**
 
 * **Frontend (React.js)**
