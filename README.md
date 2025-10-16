@@ -81,7 +81,6 @@ A responsive full‑stack web app that lets authenticated users create, save, ve
 }
 ```
 ---
-```
 ## Key Flows & Design Decisions
 
 ### Authentication
@@ -163,7 +162,6 @@ A responsive full‑stack web app that lets authenticated users create, save, ve
 
 ### Environment Variables (.env)
 
-```
 MONGO_URI=
 PORT=4002
 JWT_SECRET=
