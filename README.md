@@ -219,7 +219,14 @@ npm run dev
 
 * Check the previous prompts and its response.
 * <img width="282" height="600" alt="image" src="https://github.com/user-attachments/assets/3dbe1517-e0bc-41f0-a78b-d9ae653e86d1" />
-  <img width="440" height="333" alt="image" src="https://github.com/user-attachments/assets/fee5af00-4c69-43c4-88d0-ec903813fbc8" />
+  <img width="440" height="333" alt="image" src="https://github.com/user-attachments/assets/2c511c9a-5d8f-4d9d-93da-06d50e60899b" />
+
+  
+* Search for the prompt.
+* <img width="282" height="600" alt="Screenshot 2025-10-16 112515" src="https://github.com/user-attachments/assets/49703b1c-4af0-4d9f-9f9b-364874d40dd8" />
+  <img width="440" height="333" alt="image" src="https://github.com/user-attachments/assets/09dd9150-6b27-4dcc-a28f-ea2cbaeb36c2" />
+
+
 
 
 ---
