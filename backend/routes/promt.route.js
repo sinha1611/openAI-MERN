@@ -1,5 +1,10 @@
 import express from "express";
-import { sendPromt, getPromt, deletePromt, createdPromt } from "../controller/promt.controller.js";
+import {
+  sendPromt,
+  getPromt,
+  deletePromt,
+  createdPromt,
+} from "../controller/promt.controller.js";
 import userMiddleware from "../middleware/promt.middlware.js";
 
 const router = express.Router();

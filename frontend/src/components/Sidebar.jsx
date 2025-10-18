@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-function Sidebar({ onClose, setPromt = () => console.log("promt") }) {
+function Sidebar({ onClose, promt = [], setPromt = () => console.log("promt") }) {
   const user = JSON.parse(localStorage.getItem("user"));
   const [, setAuthUser] = useAuth();
   const [userPromt, setUserPromt] = useState([]);
@@ -14,7 +14,7 @@ function Sidebar({ onClose, setPromt = () => console.log("promt") }) {
 
   useEffect(() => {
     getPromt()
-  }, [])
+  }, [promt])
 
   const handleLogout = async () => {
     try {
@@ -59,6 +59,15 @@ function Sidebar({ onClose, setPromt = () => console.log("promt") }) {
 
     } catch (error) {
       console.log("error::", error);
+      if (error.status == 401) {
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+
+        alert(data.message);
+
+        setAuthUser(null);
+        navigate("/login");
+      };
     }
   };
 
@@ -114,12 +123,12 @@ function Sidebar({ onClose, setPromt = () => console.log("promt") }) {
       console.log("error::", error);
     }
   };
-  
+
   useEffect(() => {
     setData(userPromt.filter(item =>
       item.content.toLowerCase().includes(searchQuery.toLowerCase()))
     );
-  },[searchQuery])
+  }, [searchQuery])
 
   return (
     <div className="h-full flex flex-col justify-between p-4">
@@ -145,65 +154,62 @@ function Sidebar({ onClose, setPromt = () => console.log("promt") }) {
             placeholder="Search for Prompt"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            // value={inputValue}
-            // onChange={(e) => setInputValue(e.target.value)}
-            // onKeyDown={handleKeyDown}
             className="bg-transparent border border-gray-300 rounded-full p-2 w-full text-white placeholder-gray-400 text-base md:text-lg outline-none"
           />
-          {searchQuery.trim().length == 0 ? 
+          {searchQuery.trim().length == 0 ?
             <>
-            {userPromt.length > 0 ? <>
-              {userPromt.map(item =>
-                <div className="border-b border-gray-300 flex items-center justify-between">
-                  <div
-                    onClick={() => createdPromt(item.uniqueId)}
-                    role="button"
-                    tabIndex={0}
-                    className="capitalize pb-2 text-nowrap"
-                    style={{
-                      maxWidth: "10.5rem",
-                      overflow: "hidden"
-                    }}>
-                    {item.content}
+              {userPromt.length > 0 ? <>
+                {userPromt.map(item =>
+                  <div className="border-b border-gray-300 flex items-center justify-between">
+                    <div
+                      onClick={() => createdPromt(item.uniqueId)}
+                      role="button"
+                      tabIndex={0}
+                      className="capitalize pb-2 text-nowrap"
+                      style={{
+                        maxWidth: "10.5rem",
+                        overflow: "hidden"
+                      }}>
+                      {item.content}
+                    </div>
+                    <div onClick={() => deletePromt(item._id)} role="button" tabIndex={0}>
+                      <img src="/delete.png" alt="Gemini Logo" className="h-4" />
+                    </div>
                   </div>
-                  <div onClick={() => deletePromt(item._id)} role="button" tabIndex={0}>
-                    <img src="/delete.png" alt="Gemini Logo" className="h-4" />
-                  </div>
-                </div>
-              )}
-            </> :
-            <div className=" text-gray-500 text-sm mt-20 text-center">
-              No chat history yet
-            </div>}
-          </>
-          : <>
-          {data.length > 0 ? <>
+                )}
+              </> :
+                <div className=" text-gray-500 text-sm mt-20 text-center">
+                  No chat history yet
+                </div>}
+            </>
+            : <>
+              {data.length > 0 ? <>
 
-              {data.map(item =>
-                <div className="border-b border-gray-300 flex items-center justify-between">
-                  <div
-                    onClick={() => createdPromt(item.uniqueId)}
-                    role="button"
-                    tabIndex={0}
-                    className="capitalize pb-2 text-nowrap"
-                    style={{
-                      maxWidth: "10.5rem",
-                      overflow: "hidden"
-                    }}>
-                    {item.content}
+                {data.map(item =>
+                  <div className="border-b border-gray-300 flex items-center justify-between">
+                    <div
+                      onClick={() => createdPromt(item.uniqueId)}
+                      role="button"
+                      tabIndex={0}
+                      className="capitalize pb-2 text-nowrap"
+                      style={{
+                        maxWidth: "10.5rem",
+                        overflow: "hidden"
+                      }}>
+                      {item.content}
+                    </div>
+                    <div onClick={() => deletePromt(item._id)} role="button" tabIndex={0}>
+                      <img src="/delete.png" alt="Gemini Logo" className="h-4" />
+                    </div>
                   </div>
-                  <div onClick={() => deletePromt(item._id)} role="button" tabIndex={0}>
-                    <img src="/delete.png" alt="Gemini Logo" className="h-4" />
-                  </div>
-                </div>
-              )}
-            </> :
-            <div className=" text-gray-500 text-sm mt-20 text-center">
-              No prompt found
-            </div>}
-          </>}
-          
-          
+                )}
+              </> :
+                <div className=" text-gray-500 text-sm mt-20 text-center">
+                  No prompt found
+                </div>}
+            </>}
+
+
         </div>
       </div>
 

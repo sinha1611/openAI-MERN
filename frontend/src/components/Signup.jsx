@@ -122,13 +122,13 @@ function Signup() {
         {/* Terms & Condition */}
         <p className="text-xs text-gray-400 mt-4 mb-6">
           By signing up or logging in, you consent to Gemini's{" "}
-          <a className="underline" href="">
+          <div className="underline">
             Terms of Use
-          </a>{" "}
+          </div>{" "}
           and{" "}
-          <a className=" underline" href="">
+          <div className=" underline">
             Privacy Policy
-          </a>{" "}
+          </div>{" "}
           .
         </p>
 
@@ -143,9 +143,9 @@ function Signup() {
 
         {/* Links */}
         <div className="flex justify-between mt-4 text-sm">
-          <a className="text-[#7a6ff6] hover:underline" href="">
+          <div className="text-[#7a6ff6] hover:underline">
             Already registered?
-          </a>
+          </div>
           <Link className="text-[#7a6ff6] hover:underline" to={"/login"}>
             Login
           </Link>

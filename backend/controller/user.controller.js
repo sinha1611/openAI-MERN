@@ -18,7 +18,7 @@ export const signup = async (req, res) => {
       password: hashPassword,
     });
     await newuser.save();
-    const reg_user = await User.findOne({ email: email })
+    const reg_user = await User.findOne({ email: email });
     const token = jwt.sign({ id: reg_user._id }, config.JWT_USER_PASSWORD, {
       expiresIn: "1d",
     });
@@ -31,7 +31,9 @@ export const signup = async (req, res) => {
     };
 
     res.cookie("jwt", token, cookieOptions);
-    return res.status(201).json({ message: "signup succeeded", user: reg_user, token });
+    return res
+      .status(201)
+      .json({ message: "signup succeeded", user: reg_user, token });
   } catch (error) {
     console.log("Error in signup: ", error);
     return res.status(500).json({ errors: "Error in signup" });
