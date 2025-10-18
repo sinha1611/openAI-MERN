@@ -5,7 +5,7 @@ import { Menu } from "lucide-react";
 
 function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [promt, setPromt] = useState([]);
+  const [promt, setPromt] = useState([]);
 
   return (
     <div className="flex h-screen bg-[#1e1e1e] text-white overflow-hidden">
@@ -15,7 +15,7 @@ function Home() {
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
         md:translate-x-0 md:relative md:flex-shrink-0`}
       >
-        <Sidebar setPromt={setPromt} />
+        <Sidebar promt={promt} setPromt={setPromt} />
       </div>
 
       {/* Main content */}
@@ -30,7 +30,7 @@ function Home() {
 
         {/* Message area */}
         <div className="flex-1 flex items-center justify-center px-2 sm:px-6">
-          <Promt setPromt={setPromt} promt={promt}/>
+          <Promt setPromt={setPromt} promt={promt} />
         </div>
       </div>
 

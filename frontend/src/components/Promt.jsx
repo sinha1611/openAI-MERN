@@ -1,11 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { Paperclip, ArrowUp, Globe, Bot } from "lucide-react";
+import { Paperclip, Send, PencilLine } from "lucide-react";
 import logo from "../../public/logo.png";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { tomorrow as codeTheme } from "react-syntax-highlighter/dist/esm/styles/prism";
+import CodeWithCopy from "./Markdown";
 
 function Promt({
   promt = {},
@@ -13,9 +10,11 @@ function Promt({
 }) {
   const [inputValue, setInputValue] = useState("");
   const [typeMessage, setTypeMessage] = useState("");
-
+  const [responseJson, setResponseJson] = useState(null);
+  const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const promtEndRef = useRef();
+  const mdRef = useRef();
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -38,9 +37,10 @@ function Promt({
     promtEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [promt, loading]);
 
-  const handleSend = async () => {
-    const trimmed = inputValue.trim();
-    if (!trimmed) return;
+  const handleSend = async (payload) => {
+    const trimmed = (inputValue?.trim() ?? "") + '\n' + (payload != 'null' ? payload : "");
+
+    if (!trimmed || trimmed.length < 2) return;
 
     setInputValue("");
     setTypeMessage(trimmed);
@@ -67,6 +67,15 @@ function Promt({
       ]);
     } catch (error) {
       console.error("API Error:", error);
+      if (error.status == 401) {
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+
+        alert(data.message);
+
+        setAuthUser(null);
+        navigate("/login");
+      };
       setPromt((prev) => [
         ...prev,
         { role: "user", content: trimmed },
@@ -78,12 +87,62 @@ function Promt({
     } finally {
       setLoading(false);
       setTypeMessage(null);
+      setResponseJson(null);
+      setFile(null);
     }
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") handleSend();
+    if (e.key === "Enter") handleSend(`${JSON.stringify(responseJson)}`);
   };
+
+  const onCopy = async () => {
+    const text = mdRef.current.innerText;
+
+    try {
+      await navigator.clipboard.writeText(text);
+      alert("Copied to clipboard");
+    } catch (e) {
+      alert("Copy failed: " + e.message);
+    }
+  }
+
+  const onExport = (str) => {
+    const receivedPrompt = str.replace(/```json|```/g, '').trim();
+    const payload = (() => {
+      try { return JSON.parse(receivedPrompt); } catch { return { raw: receivedPrompt }; }
+    })();
+
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "gemini-response.json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  const onImport = (e) => {
+    const file = e.target.files?.[0];
+    setFile(file)
+    if (!file) return;
+
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const parsed = JSON.parse(ev.target.result);
+
+        setResponseJson(parsed);
+      } catch (err) {
+        alert("Invalid JSON file: " + err.message);
+      }
+    };
+    reader.readAsText(file);
+  }
 
   return (
     <div className="flex flex-col items-center justify-between flex-1 w-full px-4 pb-4 md:pb-8">
@@ -105,52 +164,47 @@ function Promt({
         {promt.map((msg, index) => (
           <div
             key={index}
-            className={`w-full flex ${
-              msg.role === "user" ? "justify-end" : "justify-start"
-            }`}
+            className={`w-full flex ${msg.role === "user" ? "justify-end" : "justify-start"
+              }`}
           >
             {msg.role === "assistant" ? (
-              // 🧠 Full-width assistant response
-              <div className="w-full bg-[#232323] text-white rounded-xl px-4 py-3 text-sm whitespace-pre-wrap">
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  components={{
-                    code({ node, inline, className, children, ...props }) {
-                      const match = /language-(\w+)/.exec(className || "");
-                      return !inline && match ? (
-                        <SyntaxHighlighter
-                          style={codeTheme}
-                          language={match[1]}
-                          PreTag="div"
-                          className="rounded-lg mt-2"
-                          {...props}
-                        >
-                          {String(children).replace(/\n$/, "")}
-                        </SyntaxHighlighter>
-                      ) : (
-                        <code
-                          className="bg-gray-800 px-1 py-0.5 rounded"
-                          {...props}
-                        >
-                          {children}
-                        </code>
-                      );
-                    },
-                  }}
+              <div className="w-full whitespace-pre-wrap">
+                <div ref={mdRef} className=" bg-[#232323] text-white rounded-xl px-4 py-3 text-sm whitespace-pre-wrap">
+                  <CodeWithCopy response={msg.content} />
+                </div>
+                <button
+                  onClick={() => onCopy(msg.content)}
+                  title="Copy"
                 >
-                  {msg.content}
-                </ReactMarkdown>
+                  <img src="./copyIcon.png" alt="Gemini Logo" className="h-5" />
+                </button>
+                <button
+                  onClick={() => onExport(msg.content)}
+                  className="ms-2"
+                  title="Download"
+                >
+                  <img src="./downloadIcon.png" alt="Gemini Logo" className="h-5" />
+                </button>
               </div>
             ) : (
-              // 👤 User message - 30% width at top-right
-              <div className="w-[30%] bg-blue-600 text-white rounded-xl px-4 py-3 text-sm whitespace-pre-wrap self-start">
-                {msg.content}
+              <div className="w-[30%] ">
+                <div style={{ overflowWrap: "anywhere" }} className="bg-blue-600 text-white rounded-xl px-4 py-3 text-sm whitespace-pre-wrap self-start">
+                  {msg.content}
+                </div>
+                <div
+                  className="float-right m-2 me-3"
+                  onClick={() => setInputValue(msg.content)}
+                  role="button"
+                  tabIndex={0}
+                  title="Edit Message"
+                >
+                  <PencilLine size={16} />
+                </div>
               </div>
             )}
           </div>
         ))}
 
-        {/* Show user's prompt while loading */}
         {loading && typeMessage && (
           <div
             className="whitespace-pre-wrap px-4 py-3 rounded-2xl text-sm break-words
@@ -160,7 +214,6 @@ function Promt({
           </div>
         )}
 
-        {/* 🤖 Typing Indicator */}
         {loading && (
           <div className="flex justify-start w-full">
             <div className="bg-[#2f2f2f] text-white px-4 py-3 rounded-xl text-sm animate-pulse">
@@ -172,23 +225,45 @@ function Promt({
         <div ref={promtEndRef} />
       </div>
 
-      {/* ➤ Input Box */}
       <div className="w-full max-w-4xl relative mt-auto">
-        <div className="bg-[#2f2f2f] rounded-[2rem] px-4 md:px-6 py-6 md:py-8 shadow-md flex">
-          <input
-            type="text"
-            placeholder="💬 Message Gemini"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="bg-transparent w-full text-white placeholder-gray-400 text-base md:text-lg outline-none"
-          />
-          {/* ➤ Send Button */}
-          <button
-            onClick={handleSend}
-            className="bg-gray-500 hover:bg-blue-600 p-2 rounded-full text-white transition"
+        <div className="flex items-center gap-3 w-full bg-[#2f2f2f] rounded-[2rem] px-4 md:px-6 py-6 md:py-8 shadow-md flex">
+          <label
+            htmlFor="fileInput"
+            className="cursor-pointer text-gray-500 hover:text-blue-600"
           >
-            <ArrowUp className="w-4 h-4" />
+            <Paperclip size={22} />
+            <input
+              id="fileInput"
+              type="file"
+              accept="application/json"
+              onChange={onImport}
+              className="hidden"
+            />
+          </label>
+
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              placeholder="💬 Message Gemini"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="bg-transparent w-full text-white placeholder-gray-400 text-base md:text-lg outline-none"
+            />
+
+            {file && (
+              <span className="absolute -top-6 left-2 text-xs text-white">
+                📎 {file.name}
+              </span>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            onClick={() => handleSend(`${JSON.stringify(responseJson)}`)}
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-2"
+          >
+            <Send size={20} />
           </button>
         </div>
       </div>

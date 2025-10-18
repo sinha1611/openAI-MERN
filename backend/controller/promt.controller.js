@@ -16,16 +16,15 @@ export const sendPromt = async (req, res) => {
       userId,
       role: "user",
       content,
-      uniqueId
+      uniqueId,
     });
 
     const completion = await openai.models.generateContent({
       model: "gemini-2.5-flash",
-      messages: [
-        { role: "user", content: content }],
-      contents: content
+      messages: [{ role: "user", content: content }],
+      contents: content,
     });
-    // console.log("completion", completion.text)
+    console.log("completion", completion.candidates[0].content);
     const aiContent = completion.text;
 
     // save assistant promt
@@ -33,7 +32,7 @@ export const sendPromt = async (req, res) => {
       userId,
       role: "assistant",
       content: aiContent,
-      uniqueId
+      uniqueId,
     });
     return res.status(200).json({ reply: aiContent });
   } catch (error) {
@@ -49,8 +48,10 @@ export const getPromt = async (req, res) => {
   const userId = req.userId;
   try {
     const user_promt = await Promt.find({ userId });
-    
-    return res.status(200).json({ promts: user_promt.filter(item => item.role == "user") });
+
+    return res
+      .status(200)
+      .json({ promts: user_promt.filter((item) => item.role == "user") });
   } catch (error) {
     console.log("Error in Promt: ", error);
     return res
@@ -63,9 +64,11 @@ export const deletePromt = async (req, res) => {
   const promtId = req.body.promt_id;
   const userId = req.body.userId;
   try {
-    const delete_promt = await Promt.findByIdAndDelete({_id: promtId });
+    const delete_promt = await Promt.findByIdAndDelete({ _id: promtId });
     const user_promt = await Promt.find({ userId });
-    return res.status(200).json({ promts: user_promt.filter(item => item.role == "user") });
+    return res
+      .status(200)
+      .json({ promts: user_promt.filter((item) => item.role == "user") });
   } catch (error) {
     console.log("Error in Promt: ", error);
     return res
@@ -77,9 +80,12 @@ export const deletePromt = async (req, res) => {
 export const createdPromt = async (req, res) => {
   const uniqueId = req.body.uniqueId;
   try {
-    const created_promt = await Promt.find({uniqueId });
-    const response = created_promt.map(item => ({role: item.role, content: item.content}))
-    console.log("response", response)
+    const created_promt = await Promt.find({ uniqueId });
+    const response = created_promt.map((item) => ({
+      role: item.role,
+      content: item.content,
+    }));
+    console.log("response", response);
     return res.status(200).json({ promts: response });
   } catch (error) {
     console.log("Error in Promt: ", error);
